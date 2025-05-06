@@ -6,7 +6,7 @@ require('dotenv').config();
 module.exports = {
   // Service URLs
   services: {
-    media: process.env.MEDIA_SERVICE_URL || 'http://localhost:3001',
+    media: process.env.MEDIA_SERVICE_URL || 'http://localhost:3003',
     auth: process.env.AUTH_SERVICE_URL || 'http://localhost:3000'
   },
   

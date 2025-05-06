@@ -9,16 +9,39 @@ const config = require('../config');
 
 /**
  * Get all events
- * @returns {Array} - All events
+ * @returns {Array} - All events with their associated media
  */
 const getAllEvents = async () => {
-  return await Event.findAll();
+  const events = await Event.findAll();
+  
+  // Fetch media for each event in parallel
+  const eventsWithMedia = await Promise.all(
+    events.map(async (event) => {
+      try {
+        const eventData = event.toJSON();
+        const media = await getMediasByEvent(event.id);
+        return {
+          ...eventData,
+          medias: media
+        };
+      } catch (error) {
+        console.error(`Error fetching media for event ${event.id}:`, error.message);
+        // Return the event without media if fetching media fails
+        return {
+          ...event.toJSON(),
+          medias: []
+        };
+      }
+    })
+  );
+  
+  return eventsWithMedia;
 };
 
 /**
  * Get event by ID
- * @param {String} id - Event ID
- * @returns {Object} - Event object
+ * @param {number} id - Event ID
+ * @returns {Object} - Event object with associated media
  */
 const getEventById = async (id) => {
   const event = await Event.findByPk(id);
@@ -27,7 +50,22 @@ const getEventById = async (id) => {
     throw new NotFoundError('Event not found');
   }
   
-  return event;
+  try {
+    const eventData = event.toJSON();
+    const media = await getMediasByEvent(id);
+    
+    return {
+      ...eventData,
+      medias: media
+    };
+  } catch (error) {
+    console.error(`Error fetching media for event ${id}:`, error.message);
+    // Return the event without media if fetching media fails
+    return {
+      ...event.toJSON(),
+      medias: []
+    };
+  }
 };
 
 /**
@@ -66,19 +104,20 @@ const deleteEvent = async (id) => {
 
 /**
  * Get media files for an event
- * @param {String} eventId - Event ID
+ * @param {number} eventId - Event ID
  * @returns {Array} - Media files
  */
 const getMediasByEvent = async (eventId) => {
   try {
-    const mediaServiceUrl = process.env.MEDIA_SERVICE_URL || 'http://localhost:3001';
+    const mediaServiceUrl = config.services.media;
     const response = await fetch(`${mediaServiceUrl}/api/media/event/${eventId}`);
     
     if (!response.ok) {
       throw new ServiceError(`Media service error: ${response.statusText}`);
     }
     
-    return await response.json();
+    const result = await response.json();
+    return result.data || [];
   } catch (error) {
     if (error instanceof ServiceError) {
       throw error;
@@ -89,7 +128,7 @@ const getMediasByEvent = async (eventId) => {
 
 /**
  * Get media files for all events in a period
- * @param {String} periodId - Period ID
+ * @param {number} periodId - Period ID
  * @returns {Array} - Media files
  */
 const getMediasByPeriod = async (periodId) => {
@@ -101,14 +140,15 @@ const getMediasByPeriod = async (periodId) => {
   }
 
   try {
-    const mediaServiceUrl = process.env.MEDIA_SERVICE_URL || 'http://localhost:3001';
+    const mediaServiceUrl = config.services.media;
     const response = await fetch(`${mediaServiceUrl}/api/media/event/${eventIds}`);
 
     if (!response.ok) {
       throw new ServiceError(`Media service error: ${response.statusText}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    return result.data || [];
   } catch (error) {
     if (error instanceof ServiceError) {
       throw error;
@@ -119,14 +159,37 @@ const getMediasByPeriod = async (periodId) => {
 
 /**
  * Get events by period
- * @param {String} periodId - Period ID
- * @returns {Array} - Events in the period
+ * @param {number} periodId - Period ID
+ * @returns {Array} - Events in the period with their associated media
  */
 const getEventsByPeriod = async (periodId) => {
-  return await Event.findAll({ 
+  const events = await Event.findAll({ 
     where: { period_id: periodId },
     order: [['date', 'ASC']]
   });
+  
+  // Fetch media for each event in parallel
+  const eventsWithMedia = await Promise.all(
+    events.map(async (event) => {
+      try {
+        const eventData = event.toJSON();
+        const media = await getMediasByEvent(event.id);
+        return {
+          ...eventData,
+          medias: media
+        };
+      } catch (error) {
+        console.error(`Error fetching media for event ${event.id}:`, error.message);
+        // Return the event without media if fetching media fails
+        return {
+          ...event.toJSON(),
+          medias: []
+        };
+      }
+    })
+  );
+  
+  return eventsWithMedia;
 };
 
 module.exports = {
