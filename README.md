@@ -1,58 +1,137 @@
-# TimelineExplorerApp
+# Timeline Explorer Application
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.9.
+A comprehensive web application for exploring historical events on interactive timelines with user authentication, comments, and media management capabilities.
 
-## Development server
+## Project Structure
 
-To start a local development server, run:
+The application follows a microservices architecture:
 
-```bash
-ng serve
-```
+- **Web**: Angular frontend application
+- **Services**:
+  - `auth_service`: Handles user authentication and authorization
+  - `comment_service`: Manages user comments on events
+  - `event_service`: Provides timeline and event data
+  - `media_service`: Manages media files associated with events
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Prerequisites
 
-## Code scaffolding
+- Node.js (v16 or higher)
+- npm (v8 or higher)
+- MongoDB (v4.4 or higher)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Running the Application
 
-```bash
-ng generate component component-name
-```
+### 1. Running the Microservices
 
-## Build
+Each microservice needs to be started individually. Open a separate terminal window for each service.
 
-To build the application for production, run:
-
-```bash
-ng build
-```
-
-The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-To execute the unit tests via [Karma](https://karma-runner.github.io), run:
+#### Auth Service
 
 ```bash
-ng test
+cd services/auth_service
+npm install
+npm run dev
 ```
 
-## Running end-to-end tests
+The auth service will run on http://localhost:3001 by default.
 
-To execute the end-to-end tests, run:
+#### Comment Service
 
 ```bash
-ng e2e
+cd services/comment_service
+npm install
+npm run dev
 ```
 
-## Further help
+The comment service will run on http://localhost:3002 by default.
 
-To get more help on the Angular CLI, run:
+#### Event Service
 
 ```bash
-ng help
+cd services/event_service
+npm install
+npm run dev
 ```
 
-To learn more about Angular, check out the [official documentation](https://angular.io/).
+The event service will run on http://localhost:3003 by default.
 
+#### Media Service
+
+```bash
+cd services/media_service
+npm install
+npm run dev
+```
+
+The media service will run on http://localhost:3004 by default.
+
+### 2. Running the Angular Frontend
+
+```bash
+cd web
+npm install
+npm start
+```
+
+The Angular application will be available at http://localhost:4200.
+
+## Features
+
+- Interactive timeline visualization
+- User authentication and authorization
+- Event creation and management
+- Comment system with moderation capabilities
+- Media upload and management
+- Admin dashboard for content moderation
+
+## Admin Features
+
+Administrators and moderators have access to a dashboard for managing comments:
+
+- View all comments (both approved and pending)
+- Filter comments by status (pending/approved)
+- Search comments by content, username, or event ID
+- Approve pending comments
+- Delete comments
+
+Access the admin dashboard through the "Dashboard" link in the user dropdown menu (only visible to users with admin or moderator roles).
+
+## Environment Configuration
+
+Each service has its own `.env` file for configuration. Make sure these are properly set up before running the services.
+
+## Testing
+
+To run tests for any of the services:
+
+```bash
+cd services/<service_name>
+npm test
+```
+
+To run tests for the Angular application:
+
+```bash
+cd web
+npm test
+```
+
+## Building for Production
+
+### Services
+
+For each service:
+
+```bash
+cd services/<service_name>
+npm start
+```
+
+### Angular Application
+
+```bash
+cd web
+npm run build
+```
+
+The build artifacts will be stored in the `web/dist/` directory.
