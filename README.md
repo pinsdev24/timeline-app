@@ -116,6 +116,42 @@ cd web
 npm test
 ```
 
+## Database Setup
+
+### Setting Up Database Schema and Sample Data
+
+The application comes with SQL scripts to set up the database schema and populate it with sample historical data.
+
+#### 1. Event Data
+
+To create the timeline tables and insert sample historical events:
+
+```bash
+cd services/event_service/src/database
+mysql -u <username> -p <database_name> < insert_timeline_data.sql
+```
+
+This will:
+- Create the periods and events tables
+- Insert sample historical periods (Préhistoire, Moyen Âge, Renaissance, etc.)
+- Insert detailed historical events with metadata (dates, locations, descriptions, themes, sources)
+
+#### 2. Media Data
+
+To set up the media table and insert sample media associated with events:
+
+```bash
+cd services/media_service/src/database
+mysql -u <username> -p <database_name> < insert_medias_data.sql
+```
+
+This will:
+- Create the media table (if not already created)
+- Insert sample media entries (images and videos) associated with historical events
+- Each media entry includes type (image/video), URL, and descriptive text
+
+The sample data provides a comprehensive set of historical periods, events, and associated media that can be used immediately after setup.
+
 ## Building for Production
 
 ### Services
